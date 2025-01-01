@@ -1,6 +1,9 @@
 import apgiotboard
 import time
 
+# binair op en neer teller. werk door te drukken op s1 om  opwaarts te tellen en s2 om neerwaarts te tellen.
+# teller bevat 6 oranje led om tot 64 te kunnen tellen.
+# teller geeft aan aan door groene led als cijfer posetief is en rode led als deze negatief is.
 
 
 def op_neer_teller ():
@@ -9,7 +12,7 @@ def op_neer_teller ():
     apgiotboard.all_leds_off()
     while True:
         
-       # time.sleep_ms(100)
+       # zet groen led aan als cijfer posteftie is en rod led als deze negatief is. 
         binary =bin(teller)[2:]
         if teller >=0:
             apgiotboard.led(2).on()
@@ -18,18 +21,18 @@ def op_neer_teller ():
             apgiotboard.led(1).on()
             apgiotboard.led(2).off()
 
-               
+        # drukknop 1 word ingelezen.        
         if apgiotboard.button_pressed(1, until_released=True):
             # Teller wordt verhoogd met een.
             teller = teller+1
-
+        # zet leds uit  die niet gebruikt worden als cijfer daalt in waardn.
             if len(binary) > len(bin(teller)[2:]):
                 apgiotboard.all_leds_off()
-        
+        # zet leds aan of uit achtereenvolgend naargelang hun waarden. 
             for i , char in enumerate(reversed(bin(teller)[2:])):
-               #print(f"The number is now {teller} in binary {binary}")
+             
                 print(f"led{i}:{char}")
-                #zet leds aan of uit aan de hand van led id= i en char= 1 of 0.
+              
                 if char=="1":
                     apgiotboard.led(i+x).on()
                     time.sleep_ms(50)
@@ -48,7 +51,6 @@ def op_neer_teller ():
                 apgiotboard.all_leds_off()
         
             for i , char in enumerate(reversed(bin(teller)[2:])):
-               #print(f"The number is now {teller} d in binary {binary}")
                 print(f"led{i}:{char}")
                 if char=="1":
                     apgiotboard.led(i+x).on()
