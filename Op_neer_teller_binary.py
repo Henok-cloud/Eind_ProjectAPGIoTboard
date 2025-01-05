@@ -2,7 +2,7 @@ import apgiotboard
 import time
 
 # binair op en neer teller. werk door te drukken op s1 om  opwaarts te tellen en s2 om neerwaarts te tellen.
-# teller bevat 6 oranje led om tot 64 te kunnen tellen.
+# teller bevat 6 oranje leds om van 0 tot 64 te kunnen tellen of aftellen.
 # teller geeft aan aan door groene led als cijfer posetief is en rode led als deze negatief is.
 
 
@@ -20,6 +20,7 @@ def op_neer_teller ():
         else:
             apgiotboard.led(1).on()
             apgiotboard.led(2).off()
+        
 
         # drukknop 1 word ingelezen.        
         if apgiotboard.button_pressed(1, until_released=True):
@@ -28,25 +29,25 @@ def op_neer_teller ():
         # zet leds uit  die niet gebruikt worden als cijfer daalt in waardn.
             if len(binary) > len(bin(teller)[2:]):
                 apgiotboard.all_leds_off()
-        # zet leds aan of uit achtereenvolgend naargelang hun waarden. 
+        # zet leds aan of uit achtereenvolgend naargelang hun waarden 1= on , 0 = off. 
             for i , char in enumerate(reversed(bin(teller)[2:])):
-             
+        # geeft stand van teller weer op scherm voor controle, deze met leds die aan off uit staan.            
                 print(f"led{i}:{char}")
-              
-                if char=="1":
-                    apgiotboard.led(i+x).on()
-                    time.sleep_ms(50)
                     
+                if char=="1":
+                            apgiotboard.led(i+x).on()
+                            time.sleep_ms(50)
+                            
                 if  char=="0":
-                    apgiotboard.led(i+x).off()
-                    time.sleep_ms(50)
-            
-                print(bin(teller)[2:], teller)
+                            apgiotboard.led(i+x).off()
+                            time.sleep_ms(50)
+                
+            print(bin(teller)[2:], teller)
             
 
         if apgiotboard.button_pressed(2,until_released=True):
             teller = teller-1
-          
+        # bij neerwaarts tellen worden leds uitgezet die niet meer gebruikt zijn.  
             if len(binary) > len(bin(teller)[2:]):
                 apgiotboard.all_leds_off()
         
