@@ -1,16 +1,22 @@
 import apgiotboard
 import time
+from apgiotboard import both_long_pressed
 
 # binair op en neer teller. werk door te drukken op s1 om  opwaarts te tellen en s2 om neerwaarts te tellen.
 # teller bevat 6 oranje leds om van 0 tot 64 te kunnen tellen of aftellen.
 # teller geeft aan aan door groene led als cijfer posetief is en rode led als deze negatief is.
+BTN1 = 1
+BTN2 = 2
+LONG_MS = 1000
 
-
-def op_neer_teller ():
+def run():
     teller = 0
     x=3
     apgiotboard.all_leds_off()
     while True:
+
+        if both_long_pressed(BTN1, BTN2):
+            return
         
        # zet groen led aan als cijfer posteftie is en rod led als deze negatief is. 
         binary =bin(teller)[2:]
@@ -20,7 +26,6 @@ def op_neer_teller ():
         else:
             apgiotboard.led(1).on()
             apgiotboard.led(2).off()
-        
 
         # drukknop 1 word ingelezen.        
         if apgiotboard.button_pressed(1, until_released=True):
@@ -62,12 +67,6 @@ def op_neer_teller ():
                     time.sleep_ms(50)
                    
                 print(bin(teller)[2:],teller)
-                
-            
-        
-      
-        
 
-
+ 
     
-op_neer_teller()

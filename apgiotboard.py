@@ -14,6 +14,7 @@ import time
 from machine import Pin, ADC
 
 
+
 MAXLED=8 # constant indicating the highest led number
 
 
@@ -72,11 +73,25 @@ def dial_value(high=65535, invert=True):
     value = int((ADC(Pin(28)).read_u16() * high) / 65535)
     return high - value if invert else value
 
+def both_long_pressed(btn1: int, btn2: int, hold_ms: int = 1000) -> bool:
+    """
+    Return True zodra beide knoppen btn1 en btn2 langer dan hold_ms ms
+    tegelijk ingedrukt zijn.
+    """
+    # blokkeer niet: poll slechts heel kort per iteratie
+    if button_pressed(btn1) and button_pressed(btn2):
+        t0 = time.ticks_ms()
+        # houd deze check kort cyclisch aan: exit zodra één knop loslaat of tijd verstreken
+        while button_pressed(btn1) and button_pressed(btn2):
+            if time.ticks_diff(time.ticks_ms(), t0) >= hold_ms:
+                return True
+            time.sleep_ms(10)
+    return False
 
 # The code in the if-statement is only executed when this file is run as script,
 # not when imported as a module. It makes it easy to quickly test the functions.
-if __name__ == '__main__':
-    from time import sleep
-    led(2).on()
-    sleep(1)
-    led(2).off()
+#if __name__ == '__main__':
+#    from time import sleep
+#   led(2).on()
+ #   sleep(1)
+  #  led(2).off()
