@@ -3,12 +3,13 @@ import time
 import apgiotboard
 from Op_neer_teller_binary import run as teller_run
 from licht_balk_verdrijver_links_rechhts import run as balk_run
+from LED_lichtshow import run as lightshow
 BTN1 = 1
 BTN2 = 2
 SHORT_MS = 200
 
 
-funcs = {1: teller_run, 2: balk_run}
+funcs = {1: teller_run, 2: balk_run, 3: lightshow}
 N_FUNCS = len(funcs)
 
 def map_dial_to_1_n():
