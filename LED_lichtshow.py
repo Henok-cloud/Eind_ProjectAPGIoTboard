@@ -97,7 +97,42 @@ def _scroll(left_to_right = True):
             _scroll_idx = LED_START + LED_COUNT - 1
 
 def _fade_chase():
+        global _fade_idx
+        
+        indices = [(LED_START + (_fade_idx + i - LED_START) % LED_COUNT) for i in range(3)]
 
+        # prepare PWM objects
+        pwms = []
+        for idx in indices:
+            p = PWM(apgiotboard.led(idx))
+            pwms.append(p)
+
+        steps = 100
+        # wave: for each step, compute duty for each LED via shifted sine
+        for step in range(steps + LED_COUNT):
+            for i, pwm in enumerate(pwms):
+                # each LED starts fading offset by its position
+                pos = step - i * (steps // 3)
+                if pos < 0:
+                    duty = 0
+                elif pos > steps:
+                    duty = 65535
+                else:
+                    angle = math.pi * pos / steps
+                    duty = int(math.sin(angle) * 65535)
+                pwm.duty_u16(duty)
+            # delay per step
+            time.sleep_ms(_get_delay() // (steps + LED_COUNT))
+
+        # clean up PWMs and leave final states
+        for pwm in pwms:
+            pwm.deinit()
+        # ensure all three end fully on
+        for idx in indices:
+            apgiotboard.led(idx).on()
+
+        # advance start index
+        _fade_idx = LED_START + ((_fade_idx - LED_START + 1) % LED_COUNT)
 
 def _rain():
 
