@@ -6,9 +6,11 @@ from machine import ADC
 
 BTN1  = 1
 BTN2  = 2
+LED_GREEN = 1
+LED_RED = 2 
 LED_START = 3 
 LONG_ms = 2000
-LED_OFFSET = 3 
+LED_COUNT = 6 
 
 # interne temp sensor verbonden aan pin 4 ADC
 temp_sensor = ADC(4)
@@ -44,20 +46,36 @@ def run():
             apgiotboard.all_leds_off()
             return
         
-        # meet temp en zet om naar 6 bit tow's complement
-        t_int = rd_intern_temp()
-        val = t_int & 0x3f
+        # lees en afronden
+        t_int =rd_intern_temp()
+        if t_int < 0:
+            t_int = 0
 
-        #toon op leds(6)
-        for i in range(6):
-            if (val >> i) & 1:
-                apgiotboard.led(LED_OFFSET + i).on()
+        #bepalen of in beriek (0-63 celsius) blijven
+        if t_int <=(1 << LED_COUNT) - 1:
+            # binnen bereiek  groen aan, rood uit
+            apgiotboard.led(LED_GREEN).on()
+            apgiotboard.led(LED_RED).off()
+            val = t_int
+        
+        else:
+            # te hoog temp rood aan, groen uit
+            apgiotboard.led(LED_GREEN).off()
+            apgiotboard.led(LED_RED).on()
+            val = (1 << LED_COUNT) -1 
+        
+        # Toon op leds 3-8
+        for i in range(LED_COUNT):
+            bit = (val >> i) & 1
+            led = apgiotboard.led(LED_START + i)
+            if bit:
+                led.on()
             else:
-                apgiotboard.led(LED_OFFSET + i).off()
+                led.off()
 
 
         # debug 
-        bits_str = ''.join('1'if (val >>(5 -j)) & 1 else '0' for j in range(6))
+        bits_str = ''.join('1'if (val >>(LED_COUNT-1-j)) & 1 else '0' for j in range(LED_COUNT))
         print(f"Temp:{t_int} °C→ {bits_str}")
 
         time.sleep(1)
