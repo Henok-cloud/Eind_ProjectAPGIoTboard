@@ -21,6 +21,7 @@ def exit_pressed():
         time.sleep_ms(10)
     return(False)
 
+
 def rd_intern_temp():
     adc_value = temp_sensor.read_u16()
 
