@@ -8,7 +8,7 @@ BTN1  = 1
 BTN2  = 2
 LED_START = 3 
 LONG_ms = 2000
-LED_count = 6 
+LED_OFFSET = 3 
 
 # interne temp sensor verbonden aan pin 4 ADC
 temp_sensor = ADC(4)
@@ -32,31 +32,32 @@ def rd_intern_temp():
     # temp omrekenen op bassis van sensor
     temp_celsius = 27 - (volt - 0.706) / 0.001721
 
-    return temp_celsius
+    return int(round(temp_celsius))
 tempC = rd_intern_temp()
 print("internal Tempratuur", tempC, "°C")
 
 def run():
     apgiotboard.all_leds_off()
     while True:
+        # exit bij lang gezamelijk drukken
         if exit_pressed():
             apgiotboard.all_leds_off()
             return
         
-        # meet temp
-        temp = rd_intern_temp()
-        t_int = int(round(temp)) #afronden
+        # meet temp en zet om naar 6 bit tow's complement
+        t_int = rd_intern_temp()
+        val = t_int & 0x3f
 
-        # omzetten naar 6 bit two's complement
-        val = t_int & ((1<<LED_count)-1)
-        bits = format(val,f'0{LED_count}b')
+        #toon op leds(6)
+        for i in range(6):
+            if (val >> i) & 1:
+                apgiotboard.led(LED_OFFSET + i).on()
+            else:
+                apgiotboard.led(LED_OFFSET + i).off()
 
-        # toont bits op LEDs 3-8
-        for i, bit in enumerate(reversed(bits)):
-            led = apgiotboard.led(LED_START + 1)
-            led.on() if bit == '1' else led.off()
 
         # debug 
-        print(f"Temp:{temp:.2f} °C {bits}")
+        bits_str = ''.join('1'if (val >>(5 -j)) & 1 else '0' for j in range(6))
+        print(f"Temp:{t_int} °C→ {bits_str}")
 
         time.sleep(1)
