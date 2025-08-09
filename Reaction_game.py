@@ -43,3 +43,21 @@ def run():
             if apgiotboard.button_pressed(target_btn):
                 dt = time.ticks_diff(time.ticks_ms(), t0)
                 socres.append(dt)
+                break
+            time.sleep_ms(10)
+        
+        # 4) korte pauze voor feedback
+        apgiotboard.all_leds_off()
+        time.sleep_ms(500)
+
+
+    # na alle rondes: bereken en toon gemiddelde
+    avg = sum(socres)/len(socres)
+    print(f"Gemiddelde reactietijde: {avg:.0f}ms")
+
+
+    # feedback via led groen/rood 
+    apgiotboard.led(led_green if avg < 300 else led_red).on()
+    time.sleep(2)
+    apgiotboard.all_leds_off()
+    
